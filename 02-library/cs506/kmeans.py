@@ -2,8 +2,6 @@ from collections import defaultdict
 from math import inf
 import random
 import csv
-# import numpy as np
-
 
 def point_avg(points):
     """
@@ -16,12 +14,13 @@ def point_avg(points):
         return []
 
     center = [0 for i in range(len(points[0]))]
+    
     for point in points:
         for i in range(len(point)):
             center[i] += point[i]
-        tmp = [i / 2 for i in center]
-        center = tmp
-    # raise NotImplementedError()
+    
+    center = [i / len(points) for i in center]
+
     return center
 
 
@@ -32,7 +31,6 @@ def update_centers(dataset, assignments):
     Compute the center for each of the assigned groups.
     Return `k` centers in a list
     """
-    # raise NotImplementedError()
     # Find k
     k = 0
     while (k in assignments):
@@ -43,10 +41,14 @@ def update_centers(dataset, assignments):
         # Find all samples in cluster i
         cluster_i_samples = []
         for sample_i in range(len(dataset)):
-            if dataset[sample_i] == cluster_i:
+            if assignments[sample_i] == cluster_i:
                 cluster_i_samples.append(dataset[sample_i])
         
         # Find centroid of all samples
+        # print("----------------------------")
+        # print(cluster_i, " has ", cluster_i_samples, "center:")
+        # print(point_avg(cluster_i_samples))
+        # print("----------------------------")
         centers.append(point_avg(cluster_i_samples))
 
     return centers
@@ -71,14 +73,22 @@ def distance(a, b):
     """
     Returns the Euclidean distance between a and b
     """
-    # raise NotImplementedError()
+    if isinstance(a, int):
+        tmp = a
+        a = [0 for i in range(len(b))]
+        a[0] = tmp
+    if isinstance(b, int):
+        tmp = b
+        b = [0 for i in range(len(a))]
+        b[0] = tmp
     if len(a) == 0 or len(b) == 0:
         return 0
-    # center = []
-    # for i in range(len(a)):
-    dist_x = (a[0] - b[0]) ** 2
-    dist_y = (a[1] - b[1]) ** 2
-    dist_hyp = (dist_x + dist_y) ** (1/2)
+
+    dist_hyp = 0
+    for i in range(len(a)):
+        dist_hyp += (a[i] - b[i]) ** 2
+    dist_hyp = dist_hyp ** (1/2)
+
     return dist_hyp
 
 def distance_squared(a, b):
@@ -113,7 +123,8 @@ def generate_k_pp(dataset, k):
     """
     # dist(a,b) / costfunction
     # raise NotImplementedError()
-    
+    weights = [distance(a,0) for a in dataset]
+    return random.choices(dataset,weights=weights, k=k)
 
 
 def _do_lloyds_algo(dataset, k_points):
