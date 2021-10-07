@@ -10,16 +10,17 @@ def point_avg(points):
     
     Returns a new point which is the center of all the points.
     """
-    if len(points) == 0:
+    n = len(points) # length of points
+    if n == 0:
         return []
-
-    center = [0 for i in range(len(points[0]))]
+    d = len(points[0]) # number of dimensions in points
+    center = [0.0] * d
     
     for point in points:
-        for i in range(len(point)):
+        for i in range(d):
             center[i] += point[i]
     
-    center = [i / len(points) for i in center]
+    center = [i / n for i in center]
 
     return center
 
@@ -31,11 +32,11 @@ def update_centers(dataset, assignments):
     Compute the center for each of the assigned groups.
     Return `k` centers in a list
     """
-    # Find k
-    k = 0
-    while (k in assignments):
-        k = k + 1
-
+    # Find number of clusters, k
+    k = max(assignments) + 1
+    print("----------------------------")
+    print(k)
+    print("----------------------------")
     centers = []
     for cluster_i in range(k):
         # Find all samples in cluster i
@@ -92,7 +93,6 @@ def distance(a, b):
     return dist_hyp
 
 def distance_squared(a, b):
-    # raise NotImplementedError()
     return distance(a, b) ** 2
 
 def generate_k(dataset, k):
@@ -100,14 +100,24 @@ def generate_k(dataset, k):
     Given `data_set`, which is an array of arrays,
     return a random set of k points from the data_set
     """
-    # raise NotImplementedError()
-    return random.choices(dataset, k=k)
+    n = len(dataset) - 1
+    centroids = []
+    chosen_index = []
+
+    for _ in range(k):
+        idx = random.randint(0,n)
+        while idx in chosen_index:
+            idx = random.randint(0,n)
+        centroids.append(dataset[idx])
+        chosen_index.append(idx)
+
+    return centroids
+
 
 def cost_function(clustering):
-    # raise NotImplementedError()
     # sum of distances squared
     res = 0
-    origin = [0 for i in range(len(clustering[0]))]
+    origin = [0 for i in range(len(clustering))]
     for point in clustering:
         res += distance_squared(point, origin)
 
@@ -122,9 +132,25 @@ def generate_k_pp(dataset, k):
     to their distance as per kmeans pp
     """
     # dist(a,b) / costfunction
-    # raise NotImplementedError()
     weights = [distance(a,0) for a in dataset]
-    return random.choices(dataset,weights=weights, k=k)
+    print("----------------------------")
+    print("Starting new clustering")
+    print(k)
+    print("----------------------------")
+    n = len(dataset)
+    dataset_i = range(n)
+    centroids = []
+    chosen_index = []
+    
+    for _ in range(k):
+        idx = random.choices(dataset_i,weights=weights, k=1)[0]
+        while idx in chosen_index:
+            idx = random.choices(dataset_i,weights=weights, k=1)[0]
+        centroids.append(dataset[idx])
+        chosen_index.append(idx)
+
+    return centroids
+    # return random.choices(dataset,weights=weights, k=1)
 
 
 def _do_lloyds_algo(dataset, k_points):
