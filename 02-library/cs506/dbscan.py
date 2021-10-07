@@ -13,5 +13,5 @@ class DBC():
             in the dataset.
         """
         
-        # raise NotImplementedError
-        self.dataset
+        raise NotImplementedError
+        # self.dataset
